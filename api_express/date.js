@@ -1,5 +1,5 @@
 
-// declaration of express
+// declaration of express require
 var express = require('express');
 var app = express();
 
