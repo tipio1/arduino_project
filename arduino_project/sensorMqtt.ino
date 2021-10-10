@@ -27,7 +27,7 @@ whith it configure MQTT server to assign publish => sept 21
 #include <Wire.h>
 
 //MQTT
-const char* mqtt_server = "192.168.1.2"; // "192.168.1.5"; // "broker.hivemq.com";  mqtt broker IP address 
+const char* mqtt_server = "test.mosquitto.org"; // "192.168.1.2"; // "192.168.1.5"; // "broker.hivemq.com";  mqtt broker IP address 
 //const int mqttPort = 1883; // mqtt broker port
 long tps=0;
 
@@ -187,13 +187,13 @@ void loop() {
      tps=millis();
      float temp = random(30);
      mqtt_publish("test/rdn_temp",temp);
-     Serial.print("Temp : ");
+     Serial.print("Temp ");
      Serial.println(temp);
      
      // Photoresistance sensor :
      float mesureLum = analogRead(photoResistancePin);
      mqtt_publish("sensor_lum/lum",mesureLum);
-     Serial.print("valeur Lum :");
+     Serial.print("valeur Lum ");
      Serial.println(mesureLum);      
       if (mesureLum > 400)        // pay attention to the declaration of the "if", do not declare the "door": "photoResistancePin" but what is "behind the door": mesureLum
       {
@@ -207,16 +207,17 @@ void loop() {
      float mesureTemp = analogRead(thermistorPin);
      temperature = ((mesureTemp - 214.5) / 10.5);    // design the graph and calculate the sensor calibration equation to adjust to the exact temperature
      mqtt_publish("sensor_temp/temp",mesureTemp);
-     Serial.print("valeur Temp :");
+     Serial.print("valeur Temp ");
      Serial.println(mesureTemp);     // help for the calibration and conversion in °C
-     Serial.print("temperature: ");
-     Serial.print(temperature);
-     Serial.println(" °C");
+     mqtt_publish("sensor_temp/temp_convert", temperature);
+     Serial.print("temperature ");
+     Serial.println(temperature);
+     //Serial.println(" °C");
      
      // Movement sensor :
      float mesureMov = digitalRead(movementPin); // pay attention to the types of sensors used: analog or digital: look for the documentation of the sensor for the code documentation
      mqtt_publish("sensor_mov/mov",mesureMov);   
-     Serial.print("movement: ");
+     Serial.print("movement ");
      Serial.println(mesureMov);
       if (mesureMov > 0)
       {
@@ -236,9 +237,9 @@ void setup_mqtt(){
 //callback must be present to suscribe to a topic and make more action
 void callback(char* topic, byte *payload, unsigned int length) {
    Serial.println("-------New mqtt broker message-----");
-   Serial.print("Channel:");
+   Serial.print("Channel ");
    Serial.println(topic);
-   Serial.print("data:");
+   Serial.print("data ");
    Serial.write(payload, length);
    Serial.println();
    if ((char)payload[0] == '1') {
